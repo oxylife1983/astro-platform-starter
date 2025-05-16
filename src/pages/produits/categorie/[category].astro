@@ -1,0 +1,102 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ProductCard from '../../../components/ProductCard.astro';
+import CategoryFilter from '../../../components/CategoryFilter.astro';
+import { getProductsByCategory } from '../../../data/products';
+
+// Enable server-side rendering for this page
+export const prerender = false;
+
+// Get the category from the URL
+const { category } = Astro.params;
+
+// Get products for this category
+const products = getProductsByCategory(category);
+
+// Capitalize category name for display
+const categoryName = category ? category.charAt(0).toUpperCase() + category.slice(1) : '';
+---
+
+<Layout title={`${categoryName} - Boissons Express`}>
+  <h1 class="mb-8">Catu00e9gorie: {categoryName}</h1>
+  
+  <div class="flex flex-col md:flex-row gap-8">
+    <!-- Sidebar with filters -->
+    <div class="w-full md:w-1/4">
+      <CategoryFilter activeCategory={category} />
+    </div>
+    
+    <!-- Product grid -->
+    <div class="w-full md:w-3/4">
+      <div class="mb-6 flex justify-between items-center">
+        <p class="text-gray-400">{products.length} produits</p>
+        <div class="flex items-center gap-2">
+          <label for="sort" class="text-sm text-gray-400">Trier par:</label>
+          <select id="sort" class="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm">
+            <option value="price-asc">Prix: croissant</option>
+            <option value="price-desc">Prix: du00e9croissant</option>
+            <option value="name-asc">Nom: A-Z</option>
+            <option value="name-desc">Nom: Z-A</option>
+          </select>
+        </div>
+      </div>
+      
+      {products.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map(product => (
+            <ProductCard product={product} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12 bg-gray-800 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h2 class="text-xl font-semibold mb-2">Aucun produit trouvu00e9</h2>
+          <p class="text-gray-400 mb-4">Aucun produit n'est disponible dans cette catu00e9gorie pour le moment.</p>
+          <a href="/produits" class="btn">Voir tous les produits</a>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Sorting functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const sortSelect = document.getElementById('sort');
+    const productGrid = document.querySelector('.grid');
+    
+    if (sortSelect && productGrid) {
+      sortSelect.addEventListener('change', () => {
+        const sortValue = sortSelect.value;
+        const productCards = Array.from(productGrid.querySelectorAll('.product-card'));
+        
+        productCards.sort((a, b) => {
+          if (sortValue === 'price-asc') {
+            const priceA = parseFloat(a.querySelector('.text-primary').getAttribute('data-price') || '0');
+            const priceB = parseFloat(b.querySelector('.text-primary').getAttribute('data-price') || '0');
+            return priceA - priceB;
+          } else if (sortValue === 'price-desc') {
+            const priceA = parseFloat(a.querySelector('.text-primary').getAttribute('data-price') || '0');
+            const priceB = parseFloat(b.querySelector('.text-primary').getAttribute('data-price') || '0');
+            return priceB - priceA;
+          } else if (sortValue === 'name-asc') {
+            const nameA = a.querySelector('h3').textContent;
+            const nameB = b.querySelector('h3').textContent;
+            return nameA.localeCompare(nameB);
+          } else if (sortValue === 'name-desc') {
+            const nameA = a.querySelector('h3').textContent;
+            const nameB = b.querySelector('h3').textContent;
+            return nameB.localeCompare(nameA);
+          }
+          return 0;
+        });
+        
+        // Remove all products and re-add them in sorted order
+        productCards.forEach(card => card.remove());
+        productCards.forEach(card => productGrid.appendChild(card));
+      });
+    }
+  });
+</script>

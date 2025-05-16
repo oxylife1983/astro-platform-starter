@@ -1,0 +1,136 @@
+---
+import { formatPrice } from '../utils/format';
+import type { Order } from '../types/ecommerce';
+import { getProductById } from '../data/products';
+
+interface Props {
+  order: Order;
+}
+
+const { order } = Astro.props;
+
+// Get product details for each item in the order
+const orderItems = order.items.map(item => {
+  const product = getProductById(item.productId);
+  return {
+    ...item,
+    product,
+    subtotal: product ? product.price * item.quantity : 0
+  };
+});
+
+// Calculate order totals
+const subtotal = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
+const shippingCost = 2500; // Fixed shipping cost in CFA
+const total = subtotal + shippingCost;
+
+// Format date
+const formattedDate = new Intl.DateTimeFormat('fr-FR', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric'
+}).format(new Date(order.createdAt));
+
+// Get status label and color
+const getStatusInfo = (status) => {
+  switch (status) {
+    case 'pending':
+      return { label: 'En attente', color: 'bg-gray-500' };
+    case 'confirmed':
+      return { label: 'Confirmu00e9e', color: 'bg-blue-500' };
+    case 'processing':
+      return { label: 'En pru00e9paration', color: 'bg-yellow-500' };
+    case 'shipped':
+      return { label: 'Expiu00e9diu00e9e', color: 'bg-indigo-500' };
+    case 'delivered':
+      return { label: 'Livru00e9e', color: 'bg-green-500' };
+    case 'cancelled':
+      return { label: 'Annulu00e9e', color: 'bg-red-500' };
+    default:
+      return { label: 'Inconnu', color: 'bg-gray-500' };
+  }
+};
+
+const statusInfo = getStatusInfo(order.status);
+---
+
+<div class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+  <!-- Order Header -->
+  <div class="bg-gray-700 p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h3 class="text-xl font-semibold">Commande #{order.id}</h3>
+      <p class="text-gray-400">Passu00e9e le {formattedDate}</p>
+    </div>
+    <span class={`px-3 py-1 ${statusInfo.color} text-white text-sm rounded-full`}>
+      {statusInfo.label}
+    </span>
+  </div>
+  
+  <!-- Order Items -->
+  <div class="p-6">
+    <h4 class="font-semibold mb-4">Articles</h4>
+    <div class="space-y-4 mb-6">
+      {orderItems.map(item => (
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="bg-gray-700 rounded w-12 h-12 flex-shrink-0 overflow-hidden">
+              {item.product && (
+                <img 
+                  src={item.product.imageUrl} 
+                  alt={item.product.name} 
+                  class="w-full h-full object-cover"
+                  onerror="this.src='/images/product-placeholder.jpg'; this.onerror='';"
+                />
+              )}
+            </div>
+            <div>
+              <p class="font-medium">{item.product ? item.product.name : 'Produit inconnu'}</p>
+              <p class="text-sm text-gray-400">{item.quantity} x {item.product ? formatPrice(item.product.price) : '0 CFA'}</p>
+            </div>
+          </div>
+          <p class="font-medium">{formatPrice(item.subtotal)}</p>
+        </div>
+      ))}
+    </div>
+    
+    <!-- Order Summary -->
+    <div class="border-t border-gray-700 pt-4 space-y-2">
+      <div class="flex justify-between">
+        <span class="text-gray-400">Sous-total</span>
+        <span>{formatPrice(subtotal)}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-400">Livraison</span>
+        <span>{formatPrice(shippingCost)}</span>
+      </div>
+      <div class="border-t border-gray-700 my-2 pt-2">
+        <div class="flex justify-between font-semibold">
+          <span>Total</span>
+          <span class="text-primary">{formatPrice(total)}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Shipping Address -->
+    <div class="mt-6">
+      <h4 class="font-semibold mb-2">Adresse de livraison</h4>
+      <div class="bg-gray-700 p-3 rounded">
+        <p>{order.shippingAddress.street}</p>
+        <p>{order.shippingAddress.city}, {order.shippingAddress.region}</p>
+        <p>{order.shippingAddress.country}</p>
+      </div>
+    </div>
+    
+    <!-- Payment Method -->
+    <div class="mt-4">
+      <h4 class="font-semibold mb-2">Mode de paiement</h4>
+      <div class="bg-gray-700 p-3 rounded">
+        <p>
+          {order.paymentMethod === 'mobile' && 'Mobile Money'}
+          {order.paymentMethod === 'cash' && 'Paiement u00e0 la livraison'}
+          {order.paymentMethod === 'bank' && 'Virement bancaire'}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

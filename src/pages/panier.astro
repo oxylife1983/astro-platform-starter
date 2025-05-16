@@ -1,0 +1,301 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getProductById } from '../data/products';
+import { formatPrice } from '../utils/format';
+---
+
+<Layout title="Votre Panier - Boissons Express">
+  <h1 class="mb-8">Votre Panier</h1>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Cart Items -->
+    <div class="lg:col-span-2">
+      <div id="cart-items" class="space-y-4">
+        <!-- Cart items will be loaded here via JavaScript -->
+        <div class="text-center py-8 text-gray-400 empty-cart-message">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <p class="text-xl">Votre panier est vide</p>
+          <p class="mt-2">Ajoutez des produits pour commencer vos achats</p>
+          <a href="/produits" class="btn mt-4 inline-block">Voir les produits</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Order Summary -->
+    <div class="lg:col-span-1">
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Ru00e9sumu00e9 de la commande</h2>
+        
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between">
+            <span class="text-gray-400">Sous-total</span>
+            <span id="subtotal">0 CFA</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Livraison</span>
+            <span id="shipping">Calculu00e9 u00e0 l'u00e9tape suivante</span>
+          </div>
+          <div class="border-t border-gray-700 my-4"></div>
+          <div class="flex justify-between font-semibold">
+            <span>Total</span>
+            <span id="total" class="text-primary text-xl">0 CFA</span>
+          </div>
+        </div>
+        
+        <button id="checkout-btn" class="btn w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          Passer la commande
+        </button>
+        
+        <div class="mt-4 text-center">
+          <a href="/produits" class="text-primary text-sm hover:underline">
+            Continuer vos achats
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { formatPrice } from '../utils/format';
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartItemsContainer = document.getElementById('cart-items');
+    const subtotalElement = document.getElementById('subtotal');
+    const totalElement = document.getElementById('total');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const emptyCartMessage = document.querySelector('.empty-cart-message');
+    
+    // Function to render cart items
+    const renderCart = async () => {
+      // Get cart from localStorage
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      
+      if (cart.length === 0) {
+        // Show empty cart message
+        if (emptyCartMessage) emptyCartMessage.style.display = 'block';
+        if (checkoutBtn) checkoutBtn.disabled = true;
+        if (subtotalElement) subtotalElement.textContent = formatPrice(0);
+        if (totalElement) totalElement.textContent = formatPrice(0);
+        return;
+      }
+      
+      // Hide empty cart message
+      if (emptyCartMessage) emptyCartMessage.style.display = 'none';
+      
+      // Clear previous items
+      if (cartItemsContainer) {
+        cartItemsContainer.innerHTML = '';
+      }
+      
+      // Fetch product data for each cart item
+      let subtotal = 0;
+      
+      // Create cart items HTML
+      for (const item of cart) {
+        try {
+          // In a real app, we would fetch this from an API
+          // For this demo, we'll use the client-side fetch
+          const response = await fetch(`/api/products/${item.productId}`);
+          const product = await response.json();
+          
+          if (!product) continue;
+          
+          const itemTotal = product.price * item.quantity;
+          subtotal += itemTotal;
+          
+          const cartItemHTML = `
+            <div class="cart-item bg-gray-800 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4" data-product-id="${product.id}">
+              <img 
+                src="${product.imageUrl}" 
+                alt="${product.name}" 
+                class="w-20 h-20 object-cover rounded"
+                onerror="this.src='/images/product-placeholder.jpg'; this.onerror='';"
+              />
+              <div class="flex-grow">
+                <h3 class="font-semibold">${product.name}</h3>
+                <p class="text-sm text-gray-400">${product.brand}</p>
+                <div class="flex items-center mt-2">
+                  <button class="decrease-qty px-2 py-1 bg-gray-700 rounded-l hover:bg-gray-600">-</button>
+                  <input 
+                    type="number" 
+                    value="${item.quantity}" 
+                    min="1" 
+                    max="${product.stock}" 
+                    class="w-12 px-2 py-1 text-center bg-gray-700 border-x border-gray-600"
+                  />
+                  <button class="increase-qty px-2 py-1 bg-gray-700 rounded-r hover:bg-gray-600">+</button>
+                </div>
+              </div>
+              <div class="flex flex-col items-end">
+                <span class="font-semibold">${formatPrice(itemTotal)}</span>
+                <button class="remove-item text-red-500 text-sm mt-2 hover:text-red-400">
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          `;
+          
+          if (cartItemsContainer) {
+            cartItemsContainer.innerHTML += cartItemHTML;
+          }
+        } catch (error) {
+          console.error('Error fetching product:', error);
+        }
+      }
+      
+      // Update totals
+      if (subtotalElement) subtotalElement.textContent = formatPrice(subtotal);
+      if (totalElement) totalElement.textContent = formatPrice(subtotal);
+      
+      // Enable checkout button if cart has items
+      if (checkoutBtn) checkoutBtn.disabled = cart.length === 0;
+      
+      // Add event listeners to cart item buttons
+      setupCartItemEvents();
+    };
+    
+    // Function to setup event listeners for cart items
+    const setupCartItemEvents = () => {
+      // Decrease quantity buttons
+      document.querySelectorAll('.decrease-qty').forEach(button => {
+        button.addEventListener('click', () => {
+          const cartItem = button.closest('.cart-item');
+          const productId = cartItem.getAttribute('data-product-id');
+          const quantityInput = cartItem.querySelector('input');
+          let quantity = parseInt(quantityInput.value);
+          
+          if (quantity > 1) {
+            quantity--;
+            quantityInput.value = quantity;
+            updateCartItem(productId, quantity);
+          }
+        });
+      });
+      
+      // Increase quantity buttons
+      document.querySelectorAll('.increase-qty').forEach(button => {
+        button.addEventListener('click', () => {
+          const cartItem = button.closest('.cart-item');
+          const productId = cartItem.getAttribute('data-product-id');
+          const quantityInput = cartItem.querySelector('input');
+          let quantity = parseInt(quantityInput.value);
+          const max = parseInt(quantityInput.getAttribute('max') || '99');
+          
+          if (quantity < max) {
+            quantity++;
+            quantityInput.value = quantity;
+            updateCartItem(productId, quantity);
+          }
+        });
+      });
+      
+      // Quantity input change
+      document.querySelectorAll('.cart-item input').forEach(input => {
+        input.addEventListener('change', () => {
+          const cartItem = input.closest('.cart-item');
+          const productId = cartItem.getAttribute('data-product-id');
+          let quantity = parseInt(input.value);
+          const max = parseInt(input.getAttribute('max') || '99');
+          
+          if (isNaN(quantity) || quantity < 1) {
+            quantity = 1;
+            input.value = quantity;
+          } else if (quantity > max) {
+            quantity = max;
+            input.value = quantity;
+          }
+          
+          updateCartItem(productId, quantity);
+        });
+      });
+      
+      // Remove item buttons
+      document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', () => {
+          const cartItem = button.closest('.cart-item');
+          const productId = cartItem.getAttribute('data-product-id');
+          removeCartItem(productId);
+        });
+      });
+    };
+    
+    // Function to update cart item quantity
+    const updateCartItem = (productId, quantity) => {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const itemIndex = cart.findIndex(item => item.productId === productId);
+      
+      if (itemIndex !== -1) {
+        cart[itemIndex].quantity = quantity;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+        updateCartCount();
+      }
+    };
+    
+    // Function to remove cart item
+    const removeCartItem = (productId) => {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart = cart.filter(item => item.productId !== productId);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+      updateCartCount();
+    };
+    
+    // Function to update cart count in header
+    const updateCartCount = () => {
+      const cartCountElement = document.getElementById('cart-count');
+      if (!cartCountElement) return;
+      
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      
+      if (totalItems > 0) {
+        cartCountElement.textContent = totalItems.toString();
+        cartCountElement.classList.remove('hidden');
+      } else {
+        cartCountElement.classList.add('hidden');
+      }
+    };
+    
+    // Checkout button event
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener('click', () => {
+        window.location.href = '/checkout';
+      });
+    }
+    
+    // Mock API endpoint for product data
+    // In a real app, this would be a server endpoint
+    if (typeof window !== 'undefined') {
+      window.addEventListener('fetch', (event) => {
+        const url = new URL(event.request.url);
+        
+        if (url.pathname.startsWith('/api/products/')) {
+          event.respondWith(
+            (async () => {
+              const productId = url.pathname.split('/').pop();
+              
+              // In a real app, fetch from database
+              // For demo, we'll use a client-side import
+              const { products } = await import('../data/products');
+              const product = products.find(p => p.id === productId);
+              
+              return new Response(
+                JSON.stringify(product || null),
+                {
+                  headers: { 'Content-Type': 'application/json' }
+                }
+              );
+            })()
+          );
+        }
+      });
+    }
+    
+    // Initial render
+    renderCart();
+  });
+</script>

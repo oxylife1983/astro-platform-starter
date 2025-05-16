@@ -1,0 +1,82 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import CategoryFilter from '../../components/CategoryFilter.astro';
+import { products, getAllCategories, getAllBrands } from '../../data/products';
+
+const categories = getAllCategories();
+const brands = getAllBrands();
+---
+
+<Layout title="Tous nos produits - Boissons Express">
+    <h1 class="mb-8">Nos Produits</h1>
+    
+    <div class="flex flex-col md:flex-row gap-8">
+        <!-- Sidebar with filters -->
+        <div class="w-full md:w-1/4">
+            <CategoryFilter />
+        </div>
+        
+        <!-- Product grid -->
+        <div class="w-full md:w-3/4">
+            <div class="mb-6 flex justify-between items-center">
+                <p class="text-gray-400">{products.length} produits</p>
+                <div class="flex items-center gap-2">
+                    <label for="sort" class="text-sm text-gray-400">Trier par:</label>
+                    <select id="sort" class="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm">
+                        <option value="price-asc">Prix: croissant</option>
+                        <option value="price-desc">Prix: du00e9croissant</option>
+                        <option value="name-asc">Nom: A-Z</option>
+                        <option value="name-desc">Nom: Z-A</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map(product => (
+                    <ProductCard product={product} />
+                ))}
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<script>
+    // Sorting functionality
+    document.addEventListener('DOMContentLoaded', () => {
+        const sortSelect = document.getElementById('sort');
+        const productGrid = document.querySelector('.grid');
+        
+        if (sortSelect && productGrid) {
+            sortSelect.addEventListener('change', () => {
+                const sortValue = sortSelect.value;
+                const productCards = Array.from(productGrid.querySelectorAll('.product-card'));
+                
+                productCards.sort((a, b) => {
+                    if (sortValue === 'price-asc') {
+                        const priceA = parseFloat(a.querySelector('.text-primary').getAttribute('data-price') || '0');
+                        const priceB = parseFloat(b.querySelector('.text-primary').getAttribute('data-price') || '0');
+                        return priceA - priceB;
+                    } else if (sortValue === 'price-desc') {
+                        const priceA = parseFloat(a.querySelector('.text-primary').getAttribute('data-price') || '0');
+                        const priceB = parseFloat(b.querySelector('.text-primary').getAttribute('data-price') || '0');
+                        return priceB - priceA;
+                    } else if (sortValue === 'name-asc') {
+                        const nameA = a.querySelector('h3').textContent;
+                        const nameB = b.querySelector('h3').textContent;
+                        return nameA.localeCompare(nameB);
+                    } else if (sortValue === 'name-desc') {
+                        const nameA = a.querySelector('h3').textContent;
+                        const nameB = b.querySelector('h3').textContent;
+                        return nameB.localeCompare(nameA);
+                    }
+                    return 0;
+                });
+                
+                // Remove all products and re-add them in sorted order
+                productCards.forEach(card => card.remove());
+                productCards.forEach(card => productGrid.appendChild(card));
+            });
+        }
+    });
+</script>

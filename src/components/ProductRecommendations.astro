@@ -1,0 +1,45 @@
+---
+import { products } from '../data/products';
+import ProductCard from './ProductCard.astro';
+
+interface Props {
+  currentProductId?: string;
+  category?: string;
+  limit?: number;
+  title?: string;
+}
+
+const { 
+  currentProductId, 
+  category, 
+  limit = 3, 
+  title = 'Produits recommandu00e9s' 
+} = Astro.props;
+
+// Get recommended products
+let recommendedProducts = [...products];
+
+// Filter by category if provided
+if (category) {
+  recommendedProducts = recommendedProducts.filter(p => p.category === category);
+}
+
+// Exclude current product if provided
+if (currentProductId) {
+  recommendedProducts = recommendedProducts.filter(p => p.id !== currentProductId);
+}
+
+// Limit the number of products
+recommendedProducts = recommendedProducts.slice(0, limit);
+---
+
+{recommendedProducts.length > 0 && (
+  <div class="mb-16">
+    <h2 class="text-2xl font-bold mb-6">{title}</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {recommendedProducts.map(product => (
+        <ProductCard product={product} />
+      ))}
+    </div>
+  </div>
+)}
