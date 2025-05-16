@@ -1,0 +1,57 @@
+---
+import { getAllCategories, getAllBrands } from '../data/products';
+
+const categories = getAllCategories();
+const brands = getAllBrands();
+
+interface Props {
+  activeCategory?: string;
+  activeBrand?: string;
+}
+
+const { activeCategory, activeBrand } = Astro.props;
+---
+
+<div class="category-filter bg-gray-800 p-4 rounded-lg mb-6">
+  <h2 class="text-xl font-semibold mb-4">Filtres</h2>
+  
+  <div class="mb-4">
+    <h3 class="text-lg font-medium mb-2">Catu00e9gories</h3>
+    <ul class="space-y-2">
+      <li>
+        <a 
+          href="/produits" 
+          class={`block px-3 py-2 rounded ${!activeCategory ? 'bg-primary text-primary-content' : 'hover:bg-gray-700'}`}
+        >
+          Tous les produits
+        </a>
+      </li>
+      {categories.map(category => (
+        <li>
+          <a 
+            href={`/produits/categorie/${category}`} 
+            class={`block px-3 py-2 rounded capitalize ${activeCategory === category ? 'bg-primary text-primary-content' : 'hover:bg-gray-700'}`}
+          >
+            {category}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+  
+  <div>
+    <h3 class="text-lg font-medium mb-2">Marques</h3>
+    <ul class="space-y-2">
+      {brands.map(brand => (
+        <li>
+          <a 
+            href={`/produits/marque/${brand}`} 
+            class={`block px-3 py-2 rounded ${activeBrand === brand ? 'bg-primary text-primary-content' : 'hover:bg-gray-700'}`}
+          >
+            {brand}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>

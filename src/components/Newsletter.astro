@@ -1,0 +1,41 @@
+---
+// Newsletter subscription component
+---
+
+<div class="bg-gray-800 rounded-lg p-8 mb-16">
+  <div class="text-center mb-6">
+    <h2 class="text-2xl font-bold mb-2">Restez informu00e9</h2>
+    <p class="text-gray-400">Abonnez-vous u00e0 notre newsletter pour recevoir nos offres spu00e9ciales et nouveautu00e9s.</p>
+  </div>
+  
+  <form id="newsletter-form" class="flex flex-col sm:flex-row gap-4">
+    <input 
+      type="email" 
+      placeholder="Votre adresse email" 
+      required 
+      class="flex-grow px-4 py-3 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+    />
+    <button type="submit" class="btn whitespace-nowrap">
+      S'abonner
+    </button>
+  </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const newsletterForm = document.getElementById('newsletter-form');
+    
+    if (newsletterForm) {
+      newsletterForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        
+        // In a real app, we would send the form data to a server
+        // For this demo, we'll just show an alert
+        alert('Merci de vous u00eatre abonnu00e9 u00e0 notre newsletter!');
+        
+        // Reset form
+        newsletterForm.reset();
+      });
+    }
+  });
+</script>

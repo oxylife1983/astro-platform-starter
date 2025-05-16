@@ -1,8 +1,16 @@
-# Astro on Netlify Platform Starter
+# Boissons Express - E-commerce pour Pharmacies en Côte d'Ivoire
 
-[Live Demo](https://astro-platform-starter.netlify.app/)
+Une application e-commerce développée avec Astro.js et Tailwind CSS, permettant aux pharmacies et commerces en Côte d'Ivoire de commander des cartons de boissons (24 canettes) en ligne.
 
-A modern starter based on Astro.js, Tailwind, and [Netlify Core Primitives](https://docs.netlify.com/core/overview/#develop) (Edge Functions, Image CDN, Blob Store).
+## Fonctionnalités
+
+- **Catalogue de produits** : Affichage des produits par catégorie et par marque
+- **Panier d'achat** : Ajout, modification et suppression de produits
+- **Processus de commande** : Checkout avec informations de livraison et options de paiement
+- **Compte utilisateur** : Création de compte, connexion, gestion du profil et des adresses
+- **Suivi des commandes** : Historique et statut des commandes
+- **Interface en français** : Adaptée au marché ivoirien
+- **Prix en francs CFA** : Affichage des prix dans la devise locale
 
 ## Astro Commands
 

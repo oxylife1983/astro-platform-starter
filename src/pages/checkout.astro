@@ -1,0 +1,367 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { formatPrice } from '../utils/format';
+---
+
+<Layout title="Finaliser votre commande - Boissons Express">
+  <h1 class="mb-8">Finaliser votre commande</h1>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Checkout Form -->
+    <div class="lg:col-span-2">
+      <div class="bg-gray-800 rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Informations de livraison</h2>
+        
+        <form id="checkout-form" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="name" class="block text-sm font-medium mb-1">Nom complet</label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                required 
+                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label for="pharmacy" class="block text-sm font-medium mb-1">Nom de la pharmacie</label>
+              <input 
+                type="text" 
+                id="pharmacy" 
+                name="pharmacy" 
+                required 
+                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label for="email" class="block text-sm font-medium mb-1">Email</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              required 
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          
+          <div>
+            <label for="phone" class="block text-sm font-medium mb-1">Tu00e9lu00e9phone</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone" 
+              required 
+              placeholder="+225 XX XX XX XX XX" 
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          
+          <div>
+            <label for="address" class="block text-sm font-medium mb-1">Adresse de livraison</label>
+            <textarea 
+              id="address" 
+              name="address" 
+              rows="3" 
+              required 
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            ></textarea>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label for="city" class="block text-sm font-medium mb-1">Ville</label>
+              <input 
+                type="text" 
+                id="city" 
+                name="city" 
+                required 
+                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div class="md:col-span-2">
+              <label for="region" class="block text-sm font-medium mb-1">Ru00e9gion</label>
+              <input 
+                type="text" 
+                id="region" 
+                name="region" 
+                required 
+                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label for="notes" class="block text-sm font-medium mb-1">Notes (optionnel)</label>
+            <textarea 
+              id="notes" 
+              name="notes" 
+              rows="2" 
+              class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Mode de paiement</h2>
+        
+        <div class="space-y-4">
+          <div class="flex items-center">
+            <input 
+              type="radio" 
+              id="payment-mobile" 
+              name="payment-method" 
+              value="mobile" 
+              checked 
+              class="h-4 w-4 text-primary focus:ring-primary border-gray-600 bg-gray-700"
+            />
+            <label for="payment-mobile" class="ml-3 block">
+              <span class="font-medium">Mobile Money</span>
+              <span class="block text-sm text-gray-400">Orange Money, MTN Mobile Money, Moov Money</span>
+            </label>
+          </div>
+          
+          <div class="flex items-center">
+            <input 
+              type="radio" 
+              id="payment-cash" 
+              name="payment-method" 
+              value="cash" 
+              class="h-4 w-4 text-primary focus:ring-primary border-gray-600 bg-gray-700"
+            />
+            <label for="payment-cash" class="ml-3 block">
+              <span class="font-medium">Paiement u00e0 la livraison</span>
+              <span class="block text-sm text-gray-400">Payez en espu00e8ces u00e0 la ru00e9ception de votre commande</span>
+            </label>
+          </div>
+          
+          <div class="flex items-center">
+            <input 
+              type="radio" 
+              id="payment-bank" 
+              name="payment-method" 
+              value="bank" 
+              class="h-4 w-4 text-primary focus:ring-primary border-gray-600 bg-gray-700"
+            />
+            <label for="payment-bank" class="ml-3 block">
+              <span class="font-medium">Virement bancaire</span>
+              <span class="block text-sm text-gray-400">Les du00e9tails du compte vous seront envoyés par email</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Order Summary -->
+    <div class="lg:col-span-1">
+      <div class="bg-gray-800 rounded-lg p-6 sticky top-6">
+        <h2 class="text-xl font-semibold mb-4">Ru00e9sumu00e9 de la commande</h2>
+        
+        <div id="order-items" class="space-y-3 mb-6 max-h-80 overflow-y-auto pr-2">
+          <!-- Order items will be loaded here via JavaScript -->
+          <div class="text-center py-4 text-gray-400">
+            <p>Chargement des produits...</p>
+          </div>
+        </div>
+        
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between">
+            <span class="text-gray-400">Sous-total</span>
+            <span id="subtotal">0 CFA</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Livraison</span>
+            <span id="shipping">2 500 CFA</span>
+          </div>
+          <div class="border-t border-gray-700 my-4"></div>
+          <div class="flex justify-between font-semibold">
+            <span>Total</span>
+            <span id="total" class="text-primary text-xl">0 CFA</span>
+          </div>
+        </div>
+        
+        <button id="place-order-btn" class="btn w-full py-3">
+          Confirmer la commande
+        </button>
+        
+        <div class="mt-4 text-center">
+          <a href="/panier" class="text-primary text-sm hover:underline">
+            Retour au panier
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Order Confirmation Modal -->
+  <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-gray-800 rounded-lg p-8 max-w-md w-full">
+      <div class="text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h2 class="text-2xl font-bold mb-4">Commande Confirmu00e9e!</h2>
+        <p class="mb-6">Votre commande a u00e9tu00e9 enregistru00e9e avec succu00e8s. Vous recevrez un email de confirmation sous peu.</p>
+        <p class="mb-4"><span class="font-semibold">Numu00e9ro de commande:</span> <span id="order-number">CMD-12345</span></p>
+        <button id="close-modal" class="btn w-full">Retour u00e0 l'accueil</button>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { formatPrice } from '../utils/format';
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const orderItemsContainer = document.getElementById('order-items');
+    const subtotalElement = document.getElementById('subtotal');
+    const shippingElement = document.getElementById('shipping');
+    const totalElement = document.getElementById('total');
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const orderNumberElement = document.getElementById('order-number');
+    const checkoutForm = document.getElementById('checkout-form');
+    
+    // Shipping cost in CFA
+    const shippingCost = 2500;
+    
+    // Function to render order items
+    const renderOrderItems = async () => {
+      // Get cart from localStorage
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      
+      if (cart.length === 0) {
+        // Redirect to cart if empty
+        window.location.href = '/panier';
+        return;
+      }
+      
+      // Clear previous items
+      if (orderItemsContainer) {
+        orderItemsContainer.innerHTML = '';
+      }
+      
+      // Fetch product data for each cart item
+      let subtotal = 0;
+      
+      // Create order items HTML
+      for (const item of cart) {
+        try {
+          // In a real app, we would fetch this from an API
+          // For this demo, we'll use the client-side fetch
+          const response = await fetch(`/api/products/${item.productId}`);
+          const product = await response.json();
+          
+          if (!product) continue;
+          
+          const itemTotal = product.price * item.quantity;
+          subtotal += itemTotal;
+          
+          const orderItemHTML = `
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <span class="text-primary font-medium">${item.quantity}x</span>
+                <span>${product.name}</span>
+              </div>
+              <span>${formatPrice(itemTotal)}</span>
+            </div>
+          `;
+          
+          if (orderItemsContainer) {
+            orderItemsContainer.innerHTML += orderItemHTML;
+          }
+        } catch (error) {
+          console.error('Error fetching product:', error);
+        }
+      }
+      
+      // Update totals
+      if (subtotalElement) subtotalElement.textContent = formatPrice(subtotal);
+      if (shippingElement) shippingElement.textContent = formatPrice(shippingCost);
+      if (totalElement) totalElement.textContent = formatPrice(subtotal + shippingCost);
+    };
+    
+    // Function to handle order placement
+    const placeOrder = (event) => {
+      event.preventDefault();
+      
+      // Validate form
+      if (checkoutForm && !checkoutForm.checkValidity()) {
+        checkoutForm.reportValidity();
+        return;
+      }
+      
+      // Generate random order number
+      const orderNumber = 'CMD-' + Math.floor(100000 + Math.random() * 900000);
+      
+      // Update order number in modal
+      if (orderNumberElement) {
+        orderNumberElement.textContent = orderNumber;
+      }
+      
+      // Show confirmation modal
+      if (confirmationModal) {
+        confirmationModal.classList.remove('hidden');
+      }
+      
+      // Clear cart
+      localStorage.removeItem('cart');
+      
+      // Update cart count in header
+      const cartCountElement = document.getElementById('cart-count');
+      if (cartCountElement) {
+        cartCountElement.classList.add('hidden');
+      }
+    };
+    
+    // Close modal and redirect to home
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', () => {
+        if (confirmationModal) {
+          confirmationModal.classList.add('hidden');
+        }
+        window.location.href = '/';
+      });
+    }
+    
+    // Place order button event
+    if (placeOrderBtn) {
+      placeOrderBtn.addEventListener('click', placeOrder);
+    }
+    
+    // Mock API endpoint for product data
+    // In a real app, this would be a server endpoint
+    if (typeof window !== 'undefined') {
+      window.addEventListener('fetch', (event) => {
+        const url = new URL(event.request.url);
+        
+        if (url.pathname.startsWith('/api/products/')) {
+          event.respondWith(
+            (async () => {
+              const productId = url.pathname.split('/').pop();
+              
+              // In a real app, fetch from database
+              // For demo, we'll use a client-side import
+              const { products } = await import('../data/products');
+              const product = products.find(p => p.id === productId);
+              
+              return new Response(
+                JSON.stringify(product || null),
+                {
+                  headers: { 'Content-Type': 'application/json' }
+                }
+              );
+            })()
+          );
+        }
+      });
+    }
+    
+    // Initial render
+    renderOrderItems();
+  });
+</script>
